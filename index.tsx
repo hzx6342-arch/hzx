@@ -27,7 +27,7 @@ if (!rootElement) {
   // 如果找不到 root 节点，尝试报错到 loader 上
   const loader = document.getElementById('initial-loader');
   if (loader) {
-    loader.innerHTML = `<div style="color:red; font-weight:bold;">${errorMsg}</div>`;
+    loader.innerHTML = `<div style="color:red; font-weight:bold; text-align:center; padding:20px;">${errorMsg}</div>`;
   }
 } else {
   try {
@@ -40,10 +40,14 @@ if (!rootElement) {
       </React.StrictMode>
     );
 
-    // 在 React 挂载完成后延迟隐藏 loader，确保内容已渲染
-    // 使用 requestAnimationFrame 确保在下一帧（即渲染后）执行
+    // 确保加载动画至少显示 3 秒
     requestAnimationFrame(() => {
-      setTimeout(hideInitialLoader, 200);
+      const startTime = (window as any).__APP_START_TIME__ || Date.now();
+      const elapsed = Date.now() - startTime;
+      const minDisplayTime = 3000; // 3秒
+      const remaining = Math.max(0, minDisplayTime - elapsed);
+      
+      setTimeout(hideInitialLoader, remaining);
     });
 
   } catch (err: any) {
