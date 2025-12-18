@@ -4,16 +4,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RedViral AI - 小红书爆款分析助手</title>
+    <title>RedViral AI - 小红书爆款分析实验室</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- 环境补丁：防止部署后 process.env 未定义导致的黑屏 -->
+    <script>
+      window.process = window.process || { env: {} };
+    </script>
+
     <style>
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         background-color: #fcfcfd;
         color: #1a1a1a;
+        margin: 0;
       }
       .font-serif-zh {
         font-family: 'Noto Serif SC', serif;
@@ -29,33 +36,97 @@
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
-      .shimmer {
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-        background-size: 200% 100%;
-        animation: shimmer 2s infinite;
+      
+      /* 初始加载动画 */
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s;
       }
-      @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
+      .loader-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ff2442 0%, #ff4d6d 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 900;
+        font-size: 32px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(255, 36, 66, 0.3);
+        animation: pulse 2s infinite ease-in-out;
       }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+      .loader-bar {
+        width: 120px;
+        height: 2px;
+        background: #f0f0f0;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .loader-progress {
+        width: 40%;
+        height: 100%;
+        background: #ff2442;
+        animation: progress 1.5s infinite ease-in-out;
+      }
+      @keyframes progress {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+      }
+      
       .perspective-1000 {
         perspective: 1000px;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "framer-motion": "https://esm.sh/framer-motion@^11.11.11"
-  }
-}
-</script>
-</head>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+        "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "framer-motion": "https://esm.sh/framer-motion@^11.11.11"
+      }
+    }
+    </script>
+  </head>
   <body>
+    <!-- 初始加载遮罩 -->
+    <div id="initial-loader">
+      <div class="loader-logo">R</div>
+      <div class="loader-bar">
+        <div class="loader-progress"></div>
+      </div>
+      <p style="margin-top: 15px; font-size: 10px; font-weight: 900; color: #ccc; letter-spacing: 0.2em; text-transform: uppercase;">Initializing Lab...</p>
+    </div>
+
     <div id="root"></div>
+
+    <!-- 脚本加载完成后自动隐藏 loader -->
+    <script type="module">
+      window.addEventListener('load', () => {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => {
+            loader.style.visibility = 'hidden';
+          }, 500);
+        }
+      });
+    </script>
   </body>
 </html>
