@@ -10,9 +10,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     
-    <!-- 环境补丁：防止部署后 process.env 未定义导致的黑屏 -->
+    <!-- 环境补丁：必须在所有脚本运行前注入，防止 process.env 未定义导致的致命错误 -->
     <script>
       window.process = window.process || { env: {} };
+      // 记录加载状态，用于全局错误捕获
+      window.__APP_START_TIME__ = Date.now();
+      
+      // 全局错误捕获：如果脚本加载失败或运行报错，直接在屏幕上显示，避免黑屏
+      window.onerror = function(message, source, lineno, colno, error) {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #ff2442;">
+              <h1 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">实验室启动失败 (Launch Error)</h1>
+              <p style="font-size: 12px; color: #666;">${message}</p>
+              <p style="font-size: 10px; color: #999; margin-top: 10px;">${source}:${lineno}</p>
+              <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #ff2442; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">刷新实验室</button>
+            </div>
+          `;
+          loader.style.opacity = '1';
+          loader.style.visibility = 'visible';
+          loader.style.background = '#fff';
+        }
+        return false;
+      };
     </script>
 
     <style>
@@ -47,43 +68,43 @@
         justify-content: center;
         background: #fff;
         z-index: 9999;
-        transition: opacity 0.5s ease-out, visibility 0.5s;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
       }
       .loader-logo {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         background: linear-gradient(135deg, #ff2442 0%, #ff4d6d 100%);
-        border-radius: 18px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 900;
-        font-size: 32px;
-        margin-bottom: 20px;
-        box-shadow: 0 10px 30px rgba(255, 36, 66, 0.3);
-        animation: pulse 2s infinite ease-in-out;
+        font-size: 36px;
+        margin-bottom: 24px;
+        box-shadow: 0 15px 35px rgba(255, 36, 66, 0.3);
+        animation: loader-pulse 2s infinite ease-in-out;
       }
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
+      @keyframes loader-pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 15px 35px rgba(255, 36, 66, 0.3); }
+        50% { transform: scale(1.08); box-shadow: 0 20px 45px rgba(255, 36, 66, 0.4); }
       }
       .loader-bar {
-        width: 120px;
-        height: 2px;
-        background: #f0f0f0;
-        border-radius: 2px;
+        width: 140px;
+        height: 3px;
+        background: #f3f4f6;
+        border-radius: 4px;
         overflow: hidden;
       }
       .loader-progress {
         width: 40%;
         height: 100%;
         background: #ff2442;
-        animation: progress 1.5s infinite ease-in-out;
+        animation: loader-progress 1.2s infinite ease-in-out;
       }
-      @keyframes progress {
+      @keyframes loader-progress {
         0% { transform: translateX(-100%); }
-        100% { transform: translateX(200%); }
+        100% { transform: translateX(250%); }
       }
       
       .perspective-1000 {
@@ -94,8 +115,9 @@
     <script type="importmap">
     {
       "imports": {
+        "react-dom": "https://esm.sh/react-dom@^19.2.3",
         "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+        "lucide-react": "https://esm.sh/lucide-react@^0.474.0",
         "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
         "react/": "https://esm.sh/react@^19.2.3/",
         "react": "https://esm.sh/react@^19.2.3",
@@ -111,22 +133,14 @@
       <div class="loader-bar">
         <div class="loader-progress"></div>
       </div>
-      <p style="margin-top: 15px; font-size: 10px; font-weight: 900; color: #ccc; letter-spacing: 0.2em; text-transform: uppercase;">Initializing Lab...</p>
+      <div style="margin-top: 20px; text-align: center;">
+        <p style="font-size: 10px; font-weight: 900; color: #111; letter-spacing: 0.3em; text-transform: uppercase;">RedViral Lab</p>
+        <p style="font-size: 8px; font-weight: 700; color: #9ca3af; letter-spacing: 0.1em; margin-top: 4px;">CALIBRATING NEURAL MODELS...</p>
+      </div>
     </div>
 
     <div id="root"></div>
 
-    <!-- 脚本加载完成后自动隐藏 loader -->
-    <script type="module">
-      window.addEventListener('load', () => {
-        const loader = document.getElementById('initial-loader');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => {
-            loader.style.visibility = 'hidden';
-          }, 500);
-        }
-      });
-    </script>
+    <!-- 脚本完成后自动隐藏逻辑已移至 index.tsx 的 React 挂载阶段，以确保真正的渲染就绪 -->
   </body>
 </html>
