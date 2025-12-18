@@ -1,0 +1,7 @@
+{
+  "name": "RedViral AI - 小红书爆款分析助手",
+  "description": "An AI-powered tool for Xiaohongshu (Little Red Book) creators to analyze viral note logic, identify trending elements, generate content ideas, and edit promotional images using Gemini models.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
