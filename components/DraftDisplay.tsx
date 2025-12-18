@@ -43,7 +43,7 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
       </motion.div>
 
       <div className="grid lg:grid-cols-12 gap-12 items-start">
-        {/* 左侧：高级标题选区 */}
+        {/* 左侧：标题 */}
         <div className="lg:col-span-5 space-y-10">
           <motion.section 
             initial={{ opacity: 0, x: -30 }}
@@ -79,7 +79,7 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ delay: i * 0.05 }}
-                    key={title} 
+                    key={`title-${i}-${title.slice(0, 10)}`} 
                     className="group relative p-7 bg-gray-50/50 rounded-[2rem] hover:bg-white border border-transparent hover:border-red-100 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-100/20" 
                     onClick={() => copyToClipboard(title, i)}
                   >
@@ -113,13 +113,6 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
                 )}
               </AnimatePresence>
             </div>
-            
-            <div className="mt-10 p-6 bg-amber-50 rounded-[2rem] flex items-start gap-4 border border-amber-100/50">
-              <MousePointer2 className="w-5 h-5 text-amber-500 mt-1" />
-              <p className="text-[11px] text-amber-700/80 font-bold leading-relaxed uppercase tracking-wider">
-                实验室建议：选择最不像标题的标题。断裂感越强，用户的“完播率”与“互动欲”越高。
-              </p>
-            </div>
           </motion.section>
 
           <motion.section 
@@ -151,7 +144,7 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
           </motion.section>
         </div>
 
-        {/* 右侧：文案正文与 10 个标签 */}
+        {/* 右侧：正文 */}
         <div className="lg:col-span-7 space-y-10">
           <motion.section 
             initial={{ opacity: 0, x: 30 }}
@@ -200,17 +193,9 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
                   {draft.content}
                 </p>
               </div>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.4 }}
-                className="mt-20 text-[10px] font-black italic text-gray-400 uppercase tracking-widest border-t border-gray-100 pt-8"
-              >
-                // Logic flow intentionally broken for authenticity. <br />
-                // All blogger-style hooks removed. 
-              </motion.div>
             </div>
 
-            {/* 10 Tags Section */}
+            {/* Tags */}
             <div className="px-16 py-12 bg-gray-50/50 border-t border-gray-100/50">
               <div className="flex items-center gap-3 mb-8 opacity-50">
                 <Hash className="w-4 h-4 text-red-500" />
@@ -220,7 +205,7 @@ const DraftDisplay: React.FC<Props> = ({ draft, onRefresh, onRefreshTitles, isRe
                 {draft.tags.map((tag, i) => (
                   <motion.span 
                     whileHover={{ scale: 1.05, backgroundColor: "#fff", borderColor: "#ff2442" }}
-                    key={i} 
+                    key={`tag-${i}`} 
                     className="px-6 py-3 bg-white rounded-2xl border border-gray-100 text-xs font-black text-gray-500 hover:text-red-500 transition-all cursor-pointer shadow-sm"
                   >
                     #{tag}

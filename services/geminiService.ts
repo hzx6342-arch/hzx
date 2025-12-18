@@ -2,13 +2,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult, ViralDraft, AnalysisInput } from "../types";
 
-// Helper to extract text output and grounding sources
+// Helper to extract text output and grounding sources with robust JSON parsing
 const extractResult = (response: any) => {
-  const text = response.text || "{}";
+  let text = response.text || "{}";
+  
+  // Strip potential markdown code blocks if the model accidentally includes them
+  if (text.includes("```")) {
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  }
+  
   let result;
   try {
     result = JSON.parse(text);
   } catch (e) {
+    console.error("Failed to parse JSON response from Gemini:", e, text);
     result = {};
   }
 
@@ -42,13 +49,7 @@ export const analyzeNote = async (input: AnalysisInput): Promise<AnalysisResult>
   2. 【视觉分析】：分析构图、色彩、滤镜如何制造“一眼入魂”的氛围感。
   3. 【文案节奏】：分析文字的留白、语气、及“非博主感”的真实性。
   4. 【评论预测】：用户会怎么“共情”？如何引导用户在评论区留下第一条“神评论”。
-  5. 【六个选题实验室】：**必须极致多样化**，包含：
-     - 极简备忘录（只有几句话）
-     - 反逻辑叙事（开头没头没脑）
-     - 情绪碎片（极度私人的瞬间）
-     - 抽象流（莫名其妙的联想）
-     - 冷静抽离（旁观者视角记录）
-     - 否定记录（其实也没发生什么）
+  5. 【六个选题实验室】：**必须极致多样化**，包含不同视角和切入点。
   
   当前时间：2025年12月18日。`;
 
@@ -166,23 +167,17 @@ export const generateDetailedDraft = async (analysis: AnalysisResult, selectedTo
   
   ⚠️ 核心铁律：禁止像博主！禁止有信息量！禁止教导！
   
-  【第一部分：文案生成（三删减法）】
+  文案生成要求：
   1. 写一段 6 句左右的、逻辑不连贯、甚至有点废话的日常感记录。
-  2. 强行删掉：第一句（开场白）、最后一句（结论）、中间随机一句。
-  3. 最终文案要保留一种“没写完”、“随手敲完就发了”的断裂感。
+  2. 强行删掉开场白、结论和中间随机一句。
+  3. 保留断裂感。
 
-  【第二部分：标题生成（人类废话结构）】
-  禁用一切“信息型”标题。生成 **5 个** 极其多样的标题：
-  1. 情绪未说完型
-  2. 自言自语型
-  3. 否定+犹豫型
-  4. 标题自残法（从正文里截取最不重要、看起来最不聪明的 2-4 个字）
-  5. 抽象流标题
+  标题生成要求：
+  生成 5 个废话标题，包含情绪未说完、自言自语、标题自残法等。
 
-  【第三部分：标签】
-  精准生成 10 个标签，混合流量词与情绪词。
+  标签：10个。
   
-  ⚠️ 输出 JSON 格式。`;
+  输出 JSON。`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -203,14 +198,12 @@ export const generateDetailedDraft = async (analysis: AnalysisResult, selectedTo
     }
   });
 
-  return JSON.parse(response.text || "{}");
+  return extractResult(response);
 };
 
-// New: Refresh topics without re-analyzing
 export const refreshTopics = async (analysis: AnalysisResult): Promise<AnalysisResult['topicIdeation']> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `基于此前的深度分析：${JSON.stringify(analysis.viralLogic)}，请再提供 6 个全新的、多样化的选题。
-  要求：避开之前的方向，挖掘更冷门、更真实、更“普通人”的瞬间。
   JSON 格式输出，包含 title, reason, difficulty, suggestedTags。`;
 
   const response = await ai.models.generateContent({
@@ -234,14 +227,12 @@ export const refreshTopics = async (analysis: AnalysisResult): Promise<AnalysisR
     }
   });
 
-  return JSON.parse(response.text || "[]");
+  return extractResult(response);
 };
 
-// New: Refresh titles without re-generating the whole content
 export const refreshTitles = async (topicTitle: string, content: string): Promise<string[]> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `基于选题【${topicTitle}】和文案【${content}】，请再生成 5 个全新的“人类废话结构”标题。
-  严格执行去博主化，使用情绪未说完、自言自语、否定犹豫、自残法、抽象流。
   直接返回 5 个字符串组成的 JSON 数组。`;
 
   const response = await ai.models.generateContent({
@@ -256,5 +247,5 @@ export const refreshTitles = async (topicTitle: string, content: string): Promis
     }
   });
 
-  return JSON.parse(response.text || "[]");
+  return extractResult(response);
 };

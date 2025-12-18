@@ -33,7 +33,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
       animate="show"
       className="space-y-16 pb-10"
     >
-      {/* 视觉钩子分析 - 深度玻璃卡片 */}
+      {/* 视觉钩子分析 */}
       <motion.section 
         variants={itemVariants}
         className="relative p-12 rounded-[3.5rem] bg-indigo-50 border border-indigo-100 overflow-hidden group shadow-inner"
@@ -57,7 +57,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
         </div>
       </motion.section>
 
-      {/* 操盘手复盘 - 双色布局 */}
+      {/* 爆款逻辑 */}
       <div className="grid lg:grid-cols-12 gap-10">
         <motion.section 
           variants={itemVariants}
@@ -73,7 +73,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
             {result.viralLogic.map((logic, i) => (
               <motion.div 
                 whileHover={{ x: 10 }}
-                key={i} 
+                key={`logic-${i}`} 
                 className="flex gap-5 items-start group"
               >
                 <span className="flex-shrink-0 w-8 h-8 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center text-xs font-black border border-gray-100 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500 transition-all duration-500">
@@ -97,7 +97,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
             </div>
             <div className="h-px w-12 bg-red-500"></div>
             <p className="text-sm text-gray-400 font-medium leading-relaxed">
-              用户不再满足于说教，这种“低防备感”的呈现方式，正是打破推荐算法同质化的钥匙。
+              这种“低防备感”的呈现方式，正是打破推荐算法同质化的钥匙。
             </p>
           </div>
         </motion.section>
@@ -116,7 +116,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
             {result.commentAnalysis.discussionPoints.map((point, i) => (
               <motion.div 
                 whileHover={{ scale: 1.01 }}
-                key={i} 
+                key={`point-${i}`} 
                 className="group p-6 bg-gray-50 rounded-[2rem] border border-transparent hover:border-blue-100 hover:bg-white transition-all shadow-sm hover:shadow-xl hover:shadow-blue-100/20"
               >
                 <div className="flex justify-between items-center mb-3">
@@ -144,7 +144,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
             <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-6">神评论埋点 / SEED_COMMENTS</p>
             <div className="space-y-4">
               {result.commentAnalysis.seedComments.map((seed, i) => (
-                <div key={i} className="p-5 bg-white rounded-2xl border border-gray-100 hover:scale-[1.02] transition-transform cursor-default">
+                <div key={`seed-${i}`} className="p-5 bg-white rounded-2xl border border-gray-100 hover:scale-[1.02] transition-transform cursor-default">
                   <p className="text-sm font-serif-zh italic text-gray-700 mb-2 leading-relaxed">“{seed.content}”</p>
                   <p className="text-[9px] text-blue-400 font-black uppercase tracking-tighter">Mission: {seed.purpose}</p>
                 </div>
@@ -154,7 +154,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
         </div>
       </motion.section>
 
-      {/* 选题库 - 交互感核心 */}
+      {/* 选题库 */}
       <motion.section variants={itemVariants} className="space-y-12 relative pt-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
           <div className="space-y-3">
@@ -187,7 +187,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 exit={{ opacity: 0, scale: 0.9, rotateY: -10 }}
                 transition={{ delay: i * 0.05 }}
-                key={topic.title} 
+                key={`topic-${i}-${topic.title}`} 
                 onClick={() => onSelectTopic(topic.title)}
                 disabled={isDrafting || isRefreshingTopics}
                 className="group text-left flex flex-col bg-white p-10 rounded-[3rem] border border-gray-100 hover:border-red-500 hover:shadow-2xl hover:shadow-red-200/40 transition-all active:scale-95 disabled:opacity-50 relative overflow-hidden h-[420px]"
@@ -211,7 +211,7 @@ const AnalysisDisplay: React.FC<Props> = ({ result, onSelectTopic, onRefreshTopi
                 
                 <div className="flex flex-wrap gap-2 mb-10">
                   {topic.suggestedTags.slice(0, 3).map((tag, t) => (
-                    <span key={t} className="text-[10px] font-black text-gray-300 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg">#{tag}</span>
+                    <span key={`tag-${i}-${t}`} className="text-[10px] font-black text-gray-300 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg">#{tag}</span>
                   ))}
                 </div>
 
